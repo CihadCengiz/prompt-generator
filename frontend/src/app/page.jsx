@@ -36,7 +36,12 @@ export default function Home() {
     }
 
     // Immediately show the new interaction in the UI
-    const tempEntry = { input: inputValue, response: null, _id: `temp-${Date.now()}` };
+    const tempEntry = {
+      input: inputValue,
+      response: null,
+      status: 'Waiting',
+      _id: `temp-${Date.now()}`,
+    };
     setInteractions((prev) => [tempEntry, ...prev]);
 
     setIsSending(true);
@@ -65,6 +70,21 @@ export default function Home() {
     }
   };
 
+  const handleLinkClick = async (id) => {
+    try {
+      await fetch(`http://localhost:3001/api/interactions/${id}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: 'Completed' }),
+      });
+      await fetchInteractions();
+    } catch (error) {
+      console.error('Error updating status:', error);
+    }
+  };
+
   return (
     <div className='min-h-screen py-2 px-4 flex flex-col items-center'>
       <h1 className='text-3xl font-bold mb-6'>Prompt Generator</h1>
@@ -87,18 +107,27 @@ export default function Home() {
               scope='col'
               className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
             >
+              Status
+            </th>
+            <th
+              scope='col'
+              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
+            >
               ChatGPT Link
             </th>
           </tr>
         </thead>
         <tbody className='bg-white divide-y divide-gray-200 max-h-96 overflow-y-auto'>
-          {interactions.map((interaction, index) => (
-            <tr key={index}>
+          {interactions.map((interaction) => (
+            <tr key={interaction._id}>
               <td className='px-6 py-4 whitespace-normal text-sm text-gray-900'>
                 {interaction.input}
               </td>
               <td className='px-6 py-4 whitespace-normal text-sm text-gray-900 max-h-64 overflow-auto'>
                 {interaction.response || 'Waiting for AI response...'}
+              </td>
+              <td className='px-6 py-4 whitespace-normal text-sm text-gray-900'>
+                {interaction.status || 'Waiting'}
               </td>
               <td className='px-6 py-4 whitespace-normal text-sm text-blue-600 hover:underline'>
                 {interaction.response && (
@@ -108,6 +137,7 @@ export default function Home() {
                   ).replace(/%20/g, '+')}`}
                   target='_blank'
                   rel='noopener noreferrer'
+                  onClick={() => handleLinkClick(interaction._id)}
                 >
                   Open in ChatGPT Codex
                 </a>
