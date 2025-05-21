@@ -91,8 +91,8 @@ export default function Home() {
     >
       <div className='flex-grow w-full flex flex-col'>
         <h1 className='text-3xl font-bold pt-6 mb-6 text-center'>Prompt Generator</h1>
-        <div className='flex-grow overflow-y-auto'>
-        <table className='min-w-full divide-y divide-gray-200 border border-gray-300 rounded-md overflow-hidden mb-6'>
+        <div className='flex flex-col flex-grow'>
+        <table className='fixed-header-table min-w-full divide-y divide-gray-200 border border-gray-300 rounded-md overflow-hidden mb-6'>
         <thead className='bg-gray-50 sticky top-0 z-10'>
           <tr>
             <th
@@ -121,7 +121,7 @@ export default function Home() {
             </th>
           </tr>
         </thead>
-        <tbody className='bg-white divide-y divide-gray-200 overflow-y-auto'>
+        <tbody className='bg-white divide-y divide-gray-200'>
           {interactions.map((interaction) => (
             <tr key={interaction._id}>
               <td className='px-6 py-4 whitespace-normal text-sm text-gray-900'>
@@ -154,19 +154,19 @@ export default function Home() {
       </div>
       </div>
 
-      <div className='flex flex-col items-center w-full max-w-md fixed bottom-0 inset-x-0 mx-auto bg-white dark:bg-gray-800 p-4 shadow-lg z-10'>
+      <div className='flex flex-col items-center w-full fixed bottom-0 inset-x-0 mx-auto bg-white dark:bg-gray-800 p-4 shadow-lg z-10'>
         <input
           type='text'
           value={inputValue}
           onChange={handleInputChange}
           placeholder='Enter something'
-          className='px-4 py-2 border border-gray-300 rounded-md mb-4 w-full shadow-md focus:outline-none focus:ring-blue-500 focus:ring-offset-2'
+          className='px-4 py-2 border border-gray-400 rounded-md mb-4 w-full shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600'
         />
         <button
           onClick={handleButtonClick}
           disabled={isSending}
-          className={`px-6 py-2 bg-blue-500 text-white font-semibold rounded-md shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ${
-            isSending ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700 active:scale-95'
+          className={`px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+            isSending ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-700 active:scale-95'
           }`}
         >
           {isSending ? 'Sending...' : 'Send to API'}
