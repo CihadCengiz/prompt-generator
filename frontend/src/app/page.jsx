@@ -86,9 +86,10 @@ export default function Home() {
   };
 
   return (
-    <div className='min-h-screen py-2 px-4 flex flex-col items-center'>
-      <h1 className='text-3xl font-bold mb-6'>Prompt Generator</h1>
-      <table className='min-w-full divide-y divide-gray-200 border border-gray-300 rounded-md overflow-hidden mb-6'>
+    <div className='min-h-screen flex flex-col items-center px-4'>
+      <div className='flex-grow overflow-y-auto w-full'>
+        <h1 className='text-3xl font-bold pt-6 mb-6 text-center'>Prompt Generator</h1>
+        <table className='min-w-full divide-y divide-gray-200 border border-gray-300 rounded-md overflow-hidden mb-6'>
         <thead className='bg-gray-50'>
           <tr>
             <th
@@ -146,9 +147,10 @@ export default function Home() {
           </tr>
           ))}
         </tbody>
-      </table>
+        </table>
+      </div>
 
-      <div className='flex flex-col items-center w-full max-w-md'>
+      <div className='flex flex-col items-center w-full max-w-md sticky bottom-0 bg-white dark:bg-gray-800 p-4 shadow-lg'>
         <input
           type='text'
           value={inputValue}
