@@ -1,7 +1,24 @@
 const express = require('express');
 const cors = require('cors');
+const mongoose = require('mongoose');
 const app = express();
 require('dotenv').config();
+
+// MongoDB Connection
+const dbURI = process.env.DB_URI;
+
+mongoose.connect(dbURI)
+  .then(() => console.log('MongoDB connected successfully.'))
+  .catch(err => console.error('MongoDB connection error:', err));
+
+// Define Interaction Schema
+const interactionSchema = new mongoose.Schema({
+  input: String,
+  response: String,
+  timestamp: { type: Date, default: Date.now }
+});
+
+const Interaction = mongoose.model('Interaction', interactionSchema);
 
 // Dynamically import GoogleGenAI
 let GoogleGenAI;
@@ -31,18 +48,39 @@ app.post('/api/process-input', async (req, res) => {
 
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_KEY });
+    const githubRepo = await fetch(
+      'https://uithub.com/CihadCengiz/prompt-generator',
+      {
+        method: 'GET',
+        headers: {
+          accept: '',
+          Accept:
+            'application/json, text/yaml, text/markdown, text/html, text/plain',
+          Authorization: `Bearer ${process.env.GITHUB_KEY}`, // Replace with your GitHub token
+        },
+      }
+    );
+    const repoContent = await githubRepo.text();
     // Use getGenerativeModel as recommended
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-preview-05-20',
-      contents: `This is your task: "${inputValue}". Describe how to best do it with this repo: "https://uithub.com/CihadCengiz/prompt-generator"`,
+      contents: `This is your task: "${inputValue}". Describe how to best do it with this repo: ${repoContent}`,
       config: {
         systemInstruction:
-          "You are a coding assistance AI that helps translating vague feature requests into a clear, comprehensive, implemantation-ready and effective single prompt for an AI coding agent. You never generate code yourself. Your sole responsibility is to deeply understand what the user wants, analyze the existing codebase and technical environment and deliver high-quality prompts.Follow these guidelines: Write focused, single task prompts. Maintain clarity and precision. Avoid overly verbose descriptions. Write the prompt like this. Keep it short: 'Task: [clear action statement] Location: [file path or context] Goal: [desired outcome]'",
+          "You are a coding assistance AI that helps translating vague feature requests into a clear, comprehensive, implemantation-ready and effective single prompt for an AI coding agent. You never generate code yourself. Your sole responsibility is to deeply understand what the user wants, analyze the existing codebase and technical environment and deliver high-quality prompts.Follow these guidelines: Write focused, single task prompts. Maintain clarity and precision. Avoid overly verbose descriptions. Write the prompt exactly like this and don't add anything. Keep it short: 'Task: [clear action statement] \nLocation: [file path or context] \nGoal: [desired outcome]'",
       },
     });
 
     const aiResponseText = response.text; // Get the text from the response
     console.log('AI Response:', aiResponseText);
+
+    // Save interaction to database
+    const newInteraction = new Interaction({
+      input: inputValue,
+      response: aiResponseText
+    });
+    await newInteraction.save();
+    console.log('Interaction saved to database.');
 
     // Send the response back to the frontend, including the AI response
     res.json({
@@ -57,6 +95,17 @@ app.post('/api/process-input', async (req, res) => {
       message: 'Error processing input with AI.',
       error: error.message,
     });
+  }
+});
+
+// New endpoint to fetch all interactions
+app.get('/api/interactions', async (req, res) => {
+  try {
+    const interactions = await Interaction.find().sort({ timestamp: -1 });
+    res.json(interactions);
+  } catch (error) {
+    console.error('Error fetching interactions:', error);
+    res.status(500).json({ message: 'Error fetching interactions.', error: error.message });
   }
 });
 
