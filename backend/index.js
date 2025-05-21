@@ -15,6 +15,7 @@ mongoose.connect(dbURI)
 const interactionSchema = new mongoose.Schema({
   input: String,
   response: String,
+  status: { type: String, default: 'Waiting' },
   timestamp: { type: Date, default: Date.now }
 });
 
@@ -75,9 +76,10 @@ app.post('/api/process-input', async (req, res) => {
     console.log('AI Response:', aiResponseText);
 
     // Save interaction to database
-    const newInteraction = new Interaction({
+  const newInteraction = new Interaction({
       input: inputValue,
-      response: aiResponseText
+      response: aiResponseText,
+      status: 'Waiting'
     });
     await newInteraction.save();
     console.log('Interaction saved to database.');
@@ -106,6 +108,29 @@ app.get('/api/interactions', async (req, res) => {
   } catch (error) {
     console.error('Error fetching interactions:', error);
     res.status(500).json({ message: 'Error fetching interactions.', error: error.message });
+  }
+});
+
+// Endpoint to update the status of a specific interaction
+app.patch('/api/interactions/:id/status', async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const updated = await Interaction.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: 'Interaction not found.' });
+    }
+
+    res.json(updated);
+  } catch (error) {
+    console.error('Error updating interaction status:', error);
+    res.status(500).json({ message: 'Error updating status.', error: error.message });
   }
 });
 
