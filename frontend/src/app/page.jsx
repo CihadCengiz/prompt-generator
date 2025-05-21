@@ -5,22 +5,24 @@ import { useState, useEffect } from 'react';
 export default function Home() {
   const [inputValue, setInputValue] = useState('');
   const [interactions, setInteractions] = useState([]);
+  const [isSending, setIsSending] = useState(false);
+
+  // Helper to fetch interactions from the backend
+  const fetchInteractions = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/interactions');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setInteractions(data);
+    } catch (error) {
+      console.error('Error fetching interactions:', error);
+    }
+  };
 
   // Fetch interactions from backend on initial load
   useEffect(() => {
-    const fetchInteractions = async () => {
-      try {
-        const response = await fetch('http://localhost:3001/api/interactions');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setInteractions(data);
-      } catch (error) {
-        console.error('Error fetching interactions:', error);
-      }
-    };
-
     fetchInteractions();
   }, []); // Empty dependency array means this runs once on mount
 
@@ -29,6 +31,16 @@ export default function Home() {
   };
 
   const handleButtonClick = async () => {
+    if (!inputValue.trim()) {
+      return;
+    }
+
+    // Immediately show the new interaction in the UI
+    const tempEntry = { input: inputValue, response: null, _id: `temp-${Date.now()}` };
+    setInteractions((prev) => [tempEntry, ...prev]);
+
+    setIsSending(true);
+
     try {
       const response = await fetch('http://localhost:3001/api/process-input', {
         method: 'POST',
@@ -44,26 +56,12 @@ export default function Home() {
 
       const data = await response.json();
       console.log('API response:', data);
-      // After successful save, refetch interactions to update the list
-      const fetchInteractions = async () => {
-        try {
-          const response = await fetch('http://localhost:3001/api/interactions');
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          const data = await response.json();
-          setInteractions(data);
-        } catch (error) {
-          console.error('Error fetching interactions:', error);
-        }
-      };
-
-      fetchInteractions();
-
-      // Clear the input field after sending
-      setInputValue('');
     } catch (error) {
       console.error('Error sending data to API:', error);
+    } finally {
+      await fetchInteractions();
+      setIsSending(false);
+      setInputValue('');
     }
   };
 
@@ -130,9 +128,12 @@ export default function Home() {
         />
         <button
           onClick={handleButtonClick}
-          className='px-6 py-2 bg-blue-500 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50'
+          disabled={isSending}
+          className={`px-6 py-2 bg-blue-500 text-white font-semibold rounded-md shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ${
+            isSending ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700 active:scale-95'
+          }`}
         >
-          Send to API
+          {isSending ? 'Sending...' : 'Send to API'}
         </button>
       </div>
     </div>
