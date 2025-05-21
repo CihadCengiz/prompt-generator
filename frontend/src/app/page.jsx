@@ -86,11 +86,14 @@ export default function Home() {
   };
 
   return (
-    <div className='min-h-screen flex flex-col items-center px-4'>
-      <div className='flex-grow overflow-y-auto w-full'>
+    <div
+      className='h-screen flex flex-col items-center px-4 pt-[calc(var(--header-height, 60px) + var(--warning-header-height, 0px))] pb-[calc(var(--input-bar-height, 90px))]'
+    >
+      <div className='flex-grow w-full flex flex-col'>
         <h1 className='text-3xl font-bold pt-6 mb-6 text-center'>Prompt Generator</h1>
+        <div className='flex-grow overflow-y-auto'>
         <table className='min-w-full divide-y divide-gray-200 border border-gray-300 rounded-md overflow-hidden mb-6'>
-        <thead className='bg-gray-50'>
+        <thead className='bg-gray-50 sticky top-0 z-10'>
           <tr>
             <th
               scope='col'
@@ -118,7 +121,7 @@ export default function Home() {
             </th>
           </tr>
         </thead>
-        <tbody className='bg-white divide-y divide-gray-200 max-h-96 overflow-y-auto'>
+        <tbody className='bg-white divide-y divide-gray-200 overflow-y-auto'>
           {interactions.map((interaction) => (
             <tr key={interaction._id}>
               <td className='px-6 py-4 whitespace-normal text-sm text-gray-900'>
@@ -149,8 +152,9 @@ export default function Home() {
         </tbody>
         </table>
       </div>
+      </div>
 
-      <div className='flex flex-col items-center w-full max-w-md sticky bottom-0 bg-white dark:bg-gray-800 p-4 shadow-lg'>
+      <div className='flex flex-col items-center w-full max-w-md fixed bottom-0 inset-x-0 mx-auto bg-white dark:bg-gray-800 p-4 shadow-lg z-10'>
         <input
           type='text'
           value={inputValue}
