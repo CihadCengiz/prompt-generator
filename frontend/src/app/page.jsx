@@ -126,11 +126,11 @@ export default function Home() {
           value={inputValue}
           onChange={handleInputChange}
           placeholder='Enter something'
-          className='px-4 py-2 border border-gray-300 rounded-md mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500'
+          className='px-4 py-2 border border-gray-300 rounded-md mb-4 w-full shadow-md focus:outline-none focus:ring-blue-500 focus:ring-offset-2'
         />
         <button
           onClick={handleButtonClick}
-          className='px-6 py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50'
+          className='px-6 py-2 bg-blue-500 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50'
         >
           Send to API
         </button>
