@@ -178,6 +178,11 @@ export default function Home() {
           type='text'
           value={inputValue}
           onChange={handleInputChange}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleButtonClick();
+            }
+          }}
           placeholder='Enter something'
           className='px-4 py-2 border border-gray-400 rounded-md mb-4 w-full shadow-sm focus:outline-none focus:border-blue-600 focus:ring-blue-600'
         />
