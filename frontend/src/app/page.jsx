@@ -104,7 +104,7 @@ export default function Home() {
 
   return (
     <div
-      className='h-screen flex flex-col items-center px-4 pt-[calc(var(--header-height, 60px) + var(--warning-header-height, 0px))] pb-[calc(var(--input-bar-height, 90px))]'
+      className='h-screen flex flex-col items-center px-4 pt-[calc(var(--header-height, 60px) + var(--warning-header-height, 0px))]'
     >
       <div className='flex-grow w-full flex flex-col'>
         <h1 className='text-3xl font-bold pt-6 mb-6 text-center'>Prompt Generator</h1>
@@ -173,7 +173,7 @@ export default function Home() {
       </div>
       </div>
 
-      <div className='flex flex-col items-center w-full fixed bottom-0 inset-x-0 mx-auto bg-white dark:bg-gray-800 p-4 shadow-lg z-10'>
+      <div className='flex flex-col items-center w-full bg-white dark:bg-gray-800 p-4 shadow-lg z-10'>
         <input
           type='text'
           value={inputValue}
