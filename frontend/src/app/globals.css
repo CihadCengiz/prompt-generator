@@ -1,9 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  --bg-color: #d9f3db;
+  --bg-color: #f3f4f6;
+  --text-color: #1f2937;
+  --header-bg: #ffffff;
+  --header-border: #e5e7eb;
+  --button-bg: #4f46e5;
+  --button-border: #4338ca;
+  --warning-bg: #fef3c7;
+  --warning-text: #92400e;
+  --warning-border: #f59e0b;
+  --primary-color: #4f46e5;
+  --secondary-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --input-focus-border: #4f46e5;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --link-color: #2563eb;
+
   --background: var(--bg-color);
-  --foreground: #212529;
+  --foreground: var(--text-color);
 }
 
 @theme inline {
@@ -15,9 +30,24 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-color: #053d1f;
+    --bg-color: #1f2937;
+    --text-color: #f3f4f6;
+    --header-bg: #111827;
+    --header-border: #374151;
+    --button-bg: #6366f1;
+    --button-border: #4f46e5;
+    --warning-bg: #92400e;
+    --warning-text: #fef3c7;
+    --warning-border: #f59e0b;
+    --primary-color: #818cf8;
+    --secondary-bg: #1f2937;
+    --input-border: #4b5563;
+    --input-focus-border: #818cf8;
+    --shadow-color: rgba(0, 0, 0, 0.4);
+    --link-color: #93c5fd;
+
     --background: var(--bg-color);
-    --foreground: #e9ecef;
+    --foreground: var(--text-color);
   }
 }
 
@@ -27,11 +57,10 @@ body {
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   overflow: hidden;
-
 }
 
 /* Utility class for tables with a sticky header and a scrollable body */
@@ -67,4 +96,51 @@ body {
 
 .hide-parent-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+header {
+  background-color: var(--header-bg);
+  border-bottom: 1px solid var(--header-border);
+  box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+button {
+  background-color: var(--button-bg);
+  border: 1px solid var(--button-border);
+  color: #fff;
+  border-radius: 8px;
+}
+
+input,
+select {
+  background-color: var(--secondary-bg);
+  color: var(--text-color);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--input-focus-border);
+  outline: none;
+}
+
+a {
+  color: var(--link-color);
+}
+
+.warning {
+  background-color: var(--warning-bg);
+  color: var(--warning-text);
+  border: 1px solid var(--warning-border);
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+.bottom-input-container {
+  box-shadow: 0 -2px 4px var(--shadow-color);
+}
+
+.github-icon {
+  fill: var(--text-color);
 }
