@@ -111,7 +111,7 @@ export default function Home() {
         {/* Modify this div to allow vertical scrolling for its content */}
         <div className='flex flex-col flex-grow min-h-0'>
           {/* Remove overflow-hidden from the table itself */}
-          <table className='fixed-header-table min-w-full divide-y divide-gray-200 border border-gray-300 rounded-md mb-6'>
+          <table className='fixed-header-table h-[50vh] min-w-full divide-y divide-gray-200 border border-gray-300 rounded-md mb-6'>
         <thead className='bg-gray-50 sticky top-0 z-10'>
           <tr>
             <th
