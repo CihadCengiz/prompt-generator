@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 export default function Home() {
   const [inputValue, setInputValue] = useState('');
   const [interactions, setInteractions] = useState([]);
-  const [isSending, setIsSending] = useState(false);
 
   // Helper to fetch interactions from the backend
   const fetchInteractions = async () => {
@@ -35,16 +34,18 @@ export default function Home() {
       return;
     }
 
-    // Immediately show the new interaction in the UI
+    const tempId = `temp-${Date.now()}`;
+
+    // Optimistically add the new interaction
     const tempEntry = {
       input: inputValue,
       response: null,
       status: 'Waiting',
-      _id: `temp-${Date.now()}`,
+      _id: tempId,
     };
     setInteractions((prev) => [tempEntry, ...prev]);
-
-    setIsSending(true);
+    const currentInput = inputValue;
+    setInputValue('');
 
     try {
       const response = await fetch('http://localhost:3001/api/process-input', {
@@ -52,7 +53,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ inputValue }),
+        body: JSON.stringify({ inputValue: currentInput }),
       });
 
       if (!response.ok) {
@@ -60,13 +61,29 @@ export default function Home() {
       }
 
       const data = await response.json();
-      console.log('API response:', data);
+
+      // Update the specific interaction with the real id and response
+      setInteractions((prev) =>
+        prev.map((int) =>
+          int._id === tempId
+            ? {
+                ...int,
+                _id: data.id,
+                response: data.aiResponse,
+                status: 'Completed',
+              }
+            : int
+        )
+      );
     } catch (error) {
       console.error('Error sending data to API:', error);
-    } finally {
-      await fetchInteractions();
-      setIsSending(false);
-      setInputValue('');
+      setInteractions((prev) =>
+        prev.map((int) =>
+          int._id === tempId
+            ? { ...int, response: 'Error', status: 'Error' }
+            : int
+        )
+      );
     }
   };
 
@@ -166,12 +183,9 @@ export default function Home() {
         />
         <button
           onClick={handleButtonClick}
-          disabled={isSending}
-          className={`px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-            isSending ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-700 active:scale-95'
-          }`}
+          className='px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 hover:bg-indigo-700 active:scale-95'
         >
-          {isSending ? 'Sending...' : 'Send to API'}
+          Send to API
         </button>
       </div>
     </div>
