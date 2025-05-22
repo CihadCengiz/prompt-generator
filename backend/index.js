@@ -7,16 +7,17 @@ require('dotenv').config();
 // MongoDB Connection
 const dbURI = process.env.DB_URI;
 
-mongoose.connect(dbURI)
+mongoose
+  .connect(dbURI)
   .then(() => console.log('MongoDB connected successfully.'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  .catch((err) => console.error('MongoDB connection error:', err));
 
 // Define Interaction Schema
 const interactionSchema = new mongoose.Schema({
   input: String,
   response: String,
   status: { type: String, default: 'Waiting' },
-  timestamp: { type: Date, default: Date.now }
+  timestamp: { type: Date, default: Date.now },
 });
 
 const Interaction = mongoose.model('Interaction', interactionSchema);
@@ -68,7 +69,9 @@ app.post('/api/process-input', async (req, res) => {
       contents: `This is your task: "${inputValue}". Describe how to best do it with this repo: ${repoContent}`,
       config: {
         systemInstruction:
-          "You are a coding assistance AI that helps translating vague feature requests into clear, comprehensive, implemantation-ready and effective prompts for an AI coding agent. You never generate code yourself. Your sole responsibility is to deeply understand what the user wants, analyze the existing codebase and technical environment and deliver high-quality prompts. Follow these guidelines: Write focused, single task prompts. Maintain clarity and precision. Avoid overly verbose descriptions. Write the prompt exactly like this and don't add anything. Keep it short: 'Task: [clear action statement] \nLocation: [file path or context] \nGoal: [desired outcome]'",
+          "You are a coding assistance AI that helps write effective prompts for an AI coding agent. Follow these guidelines: Write focused, single task prompts. Maintain clarity and precision. Avoid overly verbose descriptions. Write the prompt like this. Keep it short: 'Task: [clear action statement] Location: [file path or context] Goal: [desired outcome]'",
+        // systemInstruction:
+        // "You are a coding assistance AI that helps translating vague feature requests into clear, comprehensive, implemantation-ready and effective prompts for an AI coding agent. You never generate code yourself. Your sole responsibility is to deeply understand what the user wants, analyze the existing codebase and technical environment and deliver high-quality prompts. Follow these guidelines: Write focused, single task prompts. Maintain clarity and precision. Avoid overly verbose descriptions. Write the prompt exactly like this and don't add anything. Keep it short: 'Task: [clear action statement] \nLocation: [file path or context] \nGoal: [desired outcome]'",
       },
     });
 
@@ -76,10 +79,10 @@ app.post('/api/process-input', async (req, res) => {
     console.log('AI Response:', aiResponseText);
 
     // Save interaction to database
-  const newInteraction = new Interaction({
+    const newInteraction = new Interaction({
       input: inputValue,
       response: aiResponseText,
-      status: 'Waiting'
+      status: 'Waiting',
     });
     await newInteraction.save();
     console.log('Interaction saved to database.');
@@ -107,7 +110,9 @@ app.get('/api/interactions', async (req, res) => {
     res.json(interactions);
   } catch (error) {
     console.error('Error fetching interactions:', error);
-    res.status(500).json({ message: 'Error fetching interactions.', error: error.message });
+    res
+      .status(500)
+      .json({ message: 'Error fetching interactions.', error: error.message });
   }
 });
 
@@ -130,7 +135,9 @@ app.patch('/api/interactions/:id/status', async (req, res) => {
     res.json(updated);
   } catch (error) {
     console.error('Error updating interaction status:', error);
-    res.status(500).json({ message: 'Error updating status.', error: error.message });
+    res
+      .status(500)
+      .json({ message: 'Error updating status.', error: error.message });
   }
 });
 
