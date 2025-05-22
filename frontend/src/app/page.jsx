@@ -94,7 +94,7 @@ export default function Home() {
         {/* Modify this div to allow vertical scrolling for its content */}
         <div className='flex flex-col flex-grow min-h-0 overflow-y-auto'> {/* ADDED overflow-y-auto */}
           {/* Remove overflow-hidden from the table itself */}
-          <table className='fixed-header-table min-w-full divide-y divide-gray-200 border border-gray-300 rounded-md mb-6'> {/* REMOVED overflow-hidden */}
+          <table className='fixed-header-table min-w-full divide-y divide-gray-200 border border-gray-300 rounded-md mb-6'>
         <thead className='bg-gray-50 sticky top-0 z-10'>
           <tr>
             <th
