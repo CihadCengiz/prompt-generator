@@ -106,12 +106,12 @@ export default function Home() {
     <div
       className='h-screen flex flex-col items-center px-4 pt-[calc(var(--header-height, 60px) + var(--warning-header-height, 0px))]'
     >
-      <div className='flex-grow w-full flex flex-col'>
+      <div className='flex-grow w-full flex flex-col overflow-y-auto'>
         <h1 className='text-3xl font-bold pt-6 mb-6 text-center'>Prompt Generator</h1>
         {/* Modify this div to allow vertical scrolling for its content */}
-        <div className='flex flex-col flex-grow min-h-0'>
+        <div className='flex flex-col flex-grow min-h-0 overflow-y-auto hide-parent-scrollbar'>
           {/* Remove overflow-hidden from the table itself */}
-          <table className='fixed-header-table h-[50vh] min-w-full divide-y divide-gray-200 border border-gray-300 rounded-md mb-6'>
+          <table className='fixed-header-table flex-grow min-w-full divide-y divide-gray-200 border border-gray-300 rounded-md mb-6'>
         <thead className='bg-gray-50 sticky top-0 z-10'>
           <tr>
             <th
