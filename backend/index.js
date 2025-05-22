@@ -92,6 +92,7 @@ app.post('/api/process-input', async (req, res) => {
       message: 'Input received successfully!',
       receivedValue: inputValue,
       aiResponse: aiResponseText, // Include the AI response
+      id: newInteraction._id, // Send back the MongoDB document ID
     });
   } catch (error) {
     console.error('Error generating AI content:', error);
