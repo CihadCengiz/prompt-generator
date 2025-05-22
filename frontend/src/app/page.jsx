@@ -91,7 +91,7 @@ export default function Home() {
     >
       <div className='flex-grow w-full flex flex-col'>
         <h1 className='text-3xl font-bold pt-6 mb-6 text-center'>Prompt Generator</h1>
-        <div className='flex flex-col flex-grow min-h-0 h-[70vh]'>
+        <div className='flex flex-col flex-grow min-h-0'>
         <table className='fixed-header-table min-w-full divide-y divide-gray-200 border border-gray-300 rounded-md overflow-hidden mb-6'>
         <thead className='bg-gray-50 sticky top-0 z-10'>
           <tr>
