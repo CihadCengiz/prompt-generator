@@ -16,11 +16,11 @@
   --input-focus-border: #4f46e5;
   --shadow-color: rgba(0, 0, 0, 0.1);
   --link-color: #2563eb;
-  --datatable-header-bg: var(--primary-color);
-  --datatable-header-text: #ffffff;
 
   --background: var(--bg-color);
   --foreground: var(--text-color);
+  --datatable-header-bg: var(--primary-color);
+  --datatable-header-text: #ffffff;
 }
 
 @theme inline {
