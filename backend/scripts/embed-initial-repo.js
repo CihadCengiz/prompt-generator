@@ -1,5 +1,7 @@
+// scripts/embed-initial-repo.js
 import fs from 'fs';
 import path from 'path';
+import ignore from 'ignore';
 import { fileURLToPath } from 'url';
 import { embedAndStoreFileChunks } from '../embeddingService.js';
 import mongoose from 'mongoose';
@@ -7,8 +9,15 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(__dirname, '../'); // adjust if needed
+const repoRoot = path.resolve(__dirname, '../');
 const supportedExtensions = ['.js', '.ts', '.jsx', '.tsx', '.md'];
+
+// Load .gitignore rules
+const gitignorePath = path.join(repoRoot, '.gitignore');
+const ig = ignore();
+if (fs.existsSync(gitignorePath)) {
+  ig.add(fs.readFileSync(gitignorePath).toString());
+}
 
 async function walkFiles(dir) {
   const entries = await fs.promises.readdir(dir, { withFileTypes: true });
@@ -16,6 +25,10 @@ async function walkFiles(dir) {
 
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
+    const relPath = path.relative(repoRoot, fullPath);
+
+    if (ig.ignores(relPath)) continue;
+
     if (entry.isDirectory()) {
       files.push(...(await walkFiles(fullPath)));
     } else if (supportedExtensions.includes(path.extname(entry.name))) {
@@ -30,7 +43,6 @@ async function main() {
 
   const commitHash = `initial-${Date.now()}`;
   const repoTag = 'codex-agent';
-
   const allFiles = await walkFiles(repoRoot);
 
   for (const filePath of allFiles) {
@@ -38,14 +50,14 @@ async function main() {
     const content = fs.readFileSync(filePath, 'utf8');
 
     const result = await embedAndStoreFileChunks(relativePath, content, repoTag, commitHash);
-    console.log(`✅ Embedded: ${relativePath} — chunks: ${result.embeddedCount}, skipped: ${result.skippedCount}`);
+    console.log(`✅ ${relativePath} — chunks: ${result.embeddedCount}, skipped: ${result.skippedCount}`);
   }
 
-  console.log('✅ Initial embedding complete.');
+  console.log('✅ Initial repo embedding complete.');
   process.exit();
 }
 
-main().catch((err) => {
-  console.error('❌ Error embedding repo:', err);
+main().catch(err => {
+  console.error('❌ Error during initial embedding:', err);
   process.exit(1);
 });
