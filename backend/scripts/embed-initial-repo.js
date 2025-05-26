@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { initPinecone, embedAndStoreFileChunks } from '../embeddingService.js';
+import { embedAndStoreFileChunks } from '../embeddingService.js';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config();
