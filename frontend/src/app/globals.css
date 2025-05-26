@@ -16,6 +16,8 @@
   --input-focus-border: #4f46e5;
   --shadow-color: rgba(0, 0, 0, 0.1);
   --link-color: #2563eb;
+  --datatable-header-bg: var(--primary-color);
+  --datatable-header-text: #ffffff;
 
   --background: var(--bg-color);
   --foreground: var(--text-color);
@@ -45,6 +47,8 @@
     --input-focus-border: #818cf8;
     --shadow-color: rgba(0, 0, 0, 0.4);
     --link-color: #93c5fd;
+    --datatable-header-bg: var(--primary-color);
+    --datatable-header-text: #ffffff;
 
     --background: var(--bg-color);
     --foreground: var(--text-color);
@@ -143,4 +147,18 @@ a {
 
 .github-icon {
   fill: var(--text-color);
+}
+
+/* Styling for datatable header */
+.datatable-header {
+  background-color: var(--datatable-header-bg);
+  border-bottom: 1px solid var(--datatable-header-bg);
+}
+
+.datatable-header-th {
+  color: var(--datatable-header-text);
+  font-size: 0.75rem; /* text-xs */
+  font-weight: 500; /* font-medium */
+  text-transform: uppercase;
+  letter-spacing: 0.05em; /* tracking-wider */
 }

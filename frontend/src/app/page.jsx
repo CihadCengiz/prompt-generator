@@ -112,29 +112,29 @@ export default function Home() {
         <div className='flex flex-col flex-grow min-h-0 overflow-y-auto hide-parent-scrollbar'>
           {/* Remove overflow-hidden from the table itself */}
           <table className='fixed-header-table flex-grow min-w-full divide-y divide-gray-200 border border-gray-300 rounded-md mb-6'>
-        <thead className='bg-gray-50 sticky top-0 z-10'>
+        <thead className='datatable-header sticky top-0 z-10'>
           <tr>
             <th
               scope='col'
-              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
+              className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider datatable-header-th'
             >
               Input Value
             </th>
             <th
               scope='col'
-              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
+              className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider datatable-header-th'
             >
               AI Response
             </th>
             <th
               scope='col'
-              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
+              className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider datatable-header-th'
             >
               Status
             </th>
             <th
               scope='col'
-              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
+              className='px-6 py-3 text-left text-xs font-medium uppercase tracking-wider datatable-header-th'
             >
               ChatGPT Link
             </th>
