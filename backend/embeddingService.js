@@ -3,7 +3,7 @@ import { Pinecone } from '@pinecone-database/pinecone';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
-import { EmbeddingLog } from './models/EmbeddingLog';
+import { EmbeddingLog } from './models/EmbeddingLog.js';
 dotenv.config();
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY });

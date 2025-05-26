@@ -114,30 +114,6 @@ router.delete('/delete-commit', async (req, res) => {
   }
 });
 
-router.get('/embed-first', async (req, res) => {
-  const repoResponse = await fetch(
-    'https://uithub.com/CihadCengiz/prompt-generator',
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.GITHUB_KEY}`,
-        Accept:
-          'application/json, text/yaml, text/markdown, text/html, text/plain',
-      },
-    }
-  );
-
-  const repoContent = await repoResponse.text();
-
-  const embedResponse = await fetch('http://localhost:3001/api/embed-repo', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ repoContent, source: 'uithub' }),
-  });
-
-  const embedResult = await embedResponse.json();
-  return res.send(embedResult);
-});
-
 router.post('/embed-repo', async (req, res) => {
   try {
     const {
