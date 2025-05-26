@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 
 export default function Home() {
-  const [inputValue, setInputValue] = useState('');
+  const [userInput, setUserInput] = useState('');
   const [interactions, setInteractions] = useState([]);
 
   // Helper to fetch interactions from the backend
@@ -26,11 +26,11 @@ export default function Home() {
   }, []); // Empty dependency array means this runs once on mount
 
   const handleInputChange = (event) => {
-    setInputValue(event.target.value);
+    setUserInput(event.target.value);
   };
 
   const handleButtonClick = async () => {
-    if (!inputValue.trim()) {
+    if (!userInput.trim()) {
       return;
     }
 
@@ -38,14 +38,14 @@ export default function Home() {
 
     // Optimistically add the new interaction
     const tempEntry = {
-      input: inputValue,
+      input: userInput,
       response: null,
       status: 'Waiting',
       _id: tempId,
     };
     setInteractions((prev) => [tempEntry, ...prev]);
-    const currentInput = inputValue;
-    setInputValue('');
+    const currentInput = userInput;
+    setUserInput('');
 
     try {
       const response = await fetch('http://localhost:3001/api/process-input', {
@@ -53,7 +53,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ inputValue: currentInput }),
+        body: JSON.stringify({ userInput: currentInput }),
       });
 
       if (!response.ok) {
@@ -176,7 +176,7 @@ export default function Home() {
       <div className='flex flex-col items-center w-full bg-white dark:bg-gray-800 p-4 shadow-lg z-10'>
         <input
           type='text'
-          value={inputValue}
+          value={userInput}
           onChange={handleInputChange}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {

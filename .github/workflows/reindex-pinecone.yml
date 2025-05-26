@@ -1,0 +1,43 @@
+name: Codex Reindex & Cleanup
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  codex-agent-update:
+    if: >
+      github.event.pull_request.merged == true &&
+      contains(github.event.pull_request.labels.*.name, 'codex-agent')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get changed files
+        id: changes
+        uses: tj-actions/changed-files@v39
+        with:
+          separator: ','
+          files: |
+            **/*.js
+            **/*.ts
+            **/*.md
+
+      - name: Delete old chunks for changed files
+        run: |
+          CHANGED=$(echo "${{ steps.changes.outputs.all_changed_files }}" | jq -Rcs 'split(",")')
+          curl -X DELETE http://localhost:3001/api/process-input/delete-commit-files \
+            -H "Content-Type: application/json" \
+            -d "{\"repoTag\":\"codex-agent\",\"commitHash\":\"${{ github.event.before }}\",\"changedFiles\":$CHANGED}"
+
+      - name: Re-embed only changed files
+        run: |
+          for file in $(echo "${{ steps.changes.outputs.all_changed_files }}" | tr "," "\n"); do
+            echo "Embedding $file"
+            ESCAPED=$(cat "$file" | jq -Rs .)
+            curl -X POST http://localhost:3001/api/process-input/embed-repo \
+              -H "Content-Type: application/json" \
+              -d "{\"filePath\":\"$file\",\"repoContent\":$ESCAPED,\"repoTag\":\"codex-agent\",\"commitHash\":\"${{ github.sha }}\"}"
+          done
