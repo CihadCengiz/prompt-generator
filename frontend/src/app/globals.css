@@ -19,7 +19,7 @@
 
   --background: var(--bg-color);
   --foreground: var(--text-color);
-  --datatable-header-bg: var(--primary-color);
+  --datatable-header-bg: #4338ca;
   --datatable-header-text: #ffffff;
 }
 
@@ -47,7 +47,7 @@
     --input-focus-border: #818cf8;
     --shadow-color: rgba(0, 0, 0, 0.4);
     --link-color: #93c5fd;
-    --datatable-header-bg: var(--primary-color);
+    --datatable-header-bg: #6366f1;
     --datatable-header-text: #ffffff;
 
     --background: var(--bg-color);
