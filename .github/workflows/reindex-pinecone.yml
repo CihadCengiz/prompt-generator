@@ -11,10 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check if PR has 'codex-agent' label
-        id: label-check
+      - name: Check if PR has 'codex' label
         run: |
-          echo "${{ toJson(github.event.pull_request.labels) }}" | jq -e '.[] | select(.name == "codex-agent")' > /dev/null
+          echo "${{ toJson(github.event.pull_request.labels) }}" | jq -e '.[] | select(.name == "codex")' > /dev/null
         continue-on-error: false
 
       - name: Checkout code
