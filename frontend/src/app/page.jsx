@@ -257,13 +257,13 @@ export default function Home() {
         />
         <button
           onClick={handleGetSuggestion}
-          className='px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 hover:bg-indigo-700 active:scale-95'
+          className='px-6 py-2 mb-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg shadow-lg transform transition duration-200 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300'
         >
           Get Model Suggestion
         </button>
         <button
           onClick={handleSendToApi}
-          className='px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 hover:bg-indigo-700 active:scale-95'
+          className='px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg shadow-lg transform transition duration-200 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300'
         >
           Send to API
         </button>
