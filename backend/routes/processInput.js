@@ -1,57 +1,104 @@
-// routes/processInput.js
 import express from 'express';
 import {
   getRelevantChunks,
   embedAndStoreFileChunks,
   deleteChunksByFileList,
-} from '../embeddingService.js';
+} from '../services/embeddingService.js';
 import { Interaction } from '../models/Interaction.js';
 import { GoogleGenAI } from '@google/genai';
+import { recommendModels } from './llmRouter.js';
 
 const router = express.Router();
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_KEY });
 
-// Route for generating a prompt from user input
-router.post('/', async (req, res) => {
+// Route for generating suggestions only
+router.post('/suggest-model', async (req, res) => {
   try {
     const { userInput } = req.body;
+    const recommendations = recommendModels(userInput);
+    const inferredLocation = recommendations.inferredLocation;
 
-    //Get relevant chunks from repo
-    const relevantChunks = await getRelevantChunks(userInput, 5);
+    const relevantChunks = await getRelevantChunks(
+      userInput,
+      5,
+      inferredLocation
+    );
     const contextText = relevantChunks.join('\n\n');
 
-    //Generate a structured prompt using Gemini
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-preview-05-20',
-      contents: `Feature request: ${userInput}
-                 Context: ${contextText}`,
-      config: {
-        systemInstruction:
-          "You are an expert prompt engineer. Your job is to transform vague feature requests into precise, single-task prompts for an AI coding agent. You never write or suggest code. Instead, you: \
-          - Understand the user's intent. \
-          - Analyze the provided codebase and environment. \
-          - Deliver a short, structured, and clear prompt. \
-          \
-          Use the following format only (no extras): \
-          Task: [concise action statement]  \
-          Location: [file path, module, or relevant context]  \
-          Goal: [intended behavior or outcome] \
-          \
-          Follow these rules: \
-          - Be clear, not verbose. \
-          - Keep the task atomic (one step at a time). \
-          - If the feature request is too vague, still produce the best prompt you can based on available info. \
-          - Never explain or comment. Just return the formatted prompt.",
+    res.json({
+      context: contextText,
+      modelSuggestions: recommendations.suggestions,
+      tokenEstimates: {
+        input: recommendations.inputTokenEstimate,
+        output: recommendations.outputTokenEstimate,
       },
     });
+  } catch (err) {
+    console.error('Error suggesting model:', err);
+    res.status(500).json({ error: 'Failed to suggest model' });
+  }
+});
 
-    const aiResponseText = response.text; // Get the text from the response
+// Route for generating a prompt from user input
+router.post('/generate-prompt', async (req, res) => {
+  try {
+    let { userInput, selectedModel, contextText } = req.body;
+    if (!selectedModel || !userInput) {
+      return res.status(400).json({ error: 'Missing required input' });
+    }
+    //fallback if no context provided
+    if (!contextText) {
+      const inferredLocation = recommendModels(userInput).inferredLocation;
+      const relevantChunks = await getRelevantChunks(
+        userInput,
+        5,
+        inferredLocation
+      );
+      contextText = relevantChunks.join('\n\n');
+    }
+
+    //Route model request
+    let aiResponseText = '';
+    if (selectedModel.startsWith('gemini')) {
+      //Generate a structured prompt using Gemini
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-preview-05-20',
+        contents: `Feature request: ${userInput}
+             Context: ${contextText}`,
+        config: {
+          systemInstruction:
+            "You are an expert prompt engineer. Your job is to transform vague feature requests into precise, single-task prompts for an AI coding agent. You never write or suggest code. Instead, you: \
+            - Understand the user's intent. \
+            - Analyze the provided codebase and environment. \
+            - Deliver a short, structured, and clear prompt. \
+            \
+            Use the following format only (no extras): \
+            Task: [concise action statement]  \
+            Location: [file path, module, or relevant context]  \
+            Goal: [intended behavior or outcome] \
+            \
+            Follow these rules: \
+            - Be clear, not verbose. \
+            - Keep the task atomic (one step at a time). \
+            - If the feature request is too vague, still produce the best prompt you can based on available info. \
+            - Never explain or comment. Just return the formatted prompt.",
+        },
+      });
+      aiResponseText = response.text;
+    } else if (selectedModel.startsWith('gpt-')) {
+      console.log('gpt selected');
+      return
+    } else if (selectedModel.startsWith('claude')) {
+      console.log('claude selected');
+      return
+    }
 
     // Save interaction to database
     const newInteraction = new Interaction({
       input: userInput,
       response: aiResponseText,
       status: 'Waiting',
+      selectedModel: selectedModel,
     });
     await newInteraction.save();
     console.log('Interaction saved to database.');
@@ -119,7 +166,6 @@ router.post('/embed-repo', async (req, res) => {
     const {
       filePath,
       repoContent,
-      source = 'uithub',
       repoTag = 'codex-agent',
       commitHash,
     } = req.body;

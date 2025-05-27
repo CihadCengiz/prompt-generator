@@ -1,23 +1,30 @@
-// scripts/embed-initial-repo.js
 import fs from 'fs';
 import path from 'path';
 import ignore from 'ignore';
 import { fileURLToPath } from 'url';
-import { embedAndStoreFileChunks } from '../embeddingService.js';
+import { embedAndStoreFileChunks } from '../services/embeddingService.js';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(__dirname, '../');
+const repoRoot = path.resolve(__dirname, '../../');
 const supportedExtensions = ['.js', '.ts', '.jsx', '.tsx', '.md'];
 
-// Load .gitignore rules
-const gitignorePath = path.join(repoRoot, '.gitignore');
-const ig = ignore();
-if (fs.existsSync(gitignorePath)) {
-  ig.add(fs.readFileSync(gitignorePath).toString());
+// Merge .gitignore rules from backend, and frontend
+function loadIgnoreRules() {
+  const ig = ignore();
+  const locations = ['backend/.gitignore', 'frontend/.gitignore'];
+  for (const file of locations) {
+    const fullPath = path.join(repoRoot, file);
+    if (fs.existsSync(fullPath)) {
+      ig.add(fs.readFileSync(fullPath, 'utf8'));
+    }
+  }
+  return ig;
 }
+
+const ig = loadIgnoreRules();
 
 async function walkFiles(dir) {
   const entries = await fs.promises.readdir(dir, { withFileTypes: true });
@@ -39,7 +46,7 @@ async function walkFiles(dir) {
 }
 
 async function main() {
-  await mongoose.connect(process.env.DB_URI);
+  await mongoose.connect(process.env.MONGO_URI);
 
   const commitHash = `initial-${Date.now()}`;
   const repoTag = 'codex-agent';
@@ -49,15 +56,22 @@ async function main() {
     const relativePath = path.relative(repoRoot, filePath);
     const content = fs.readFileSync(filePath, 'utf8');
 
-    const result = await embedAndStoreFileChunks(relativePath, content, repoTag, commitHash);
-    console.log(`✅ ${relativePath} — chunks: ${result.embeddedCount}, skipped: ${result.skippedCount}`);
+    const result = await embedAndStoreFileChunks(
+      relativePath,
+      content,
+      repoTag,
+      commitHash
+    );
+    console.log(
+      `✅ ${relativePath} — chunks: ${result.embeddedCount}, skipped: ${result.skippedCount}`
+    );
   }
 
   console.log('✅ Initial repo embedding complete.');
   process.exit();
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error('❌ Error during initial embedding:', err);
   process.exit(1);
 });

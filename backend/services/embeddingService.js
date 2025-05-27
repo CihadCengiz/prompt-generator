@@ -3,7 +3,7 @@ import { Pinecone } from '@pinecone-database/pinecone';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
-import { EmbeddingLog } from './models/EmbeddingLog.js';
+import { EmbeddingLog } from '../models/EmbeddingLog.js';
 dotenv.config();
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
@@ -165,18 +165,38 @@ export async function deleteChunksByFileList(repoTag, commitHash, filePaths) {
   }
 }
 
-export async function getRelevantChunks(query, topK = 5) {
+export async function getRelevantChunks(query, topK = 5, inferredFile = '') {
   const response = await openai.embeddings.create({
     model: 'text-embedding-3-small',
     input: [query],
   });
 
   const queryEmbedding = response.data[0].embedding;
+
   const result = await index.query({
     vector: queryEmbedding,
-    topK,
+    topK: topK * 2,
     includeMetadata: true,
   });
 
-  return result.matches.map((m) => m.metadata.text);
+  const matches = result.matches || [];
+
+  const softScore = (meta) => {
+    const path = (meta?.filePath || '').toLowerCase();
+    const fileMatch = inferredFile
+      ? path.includes(inferredFile.toLowerCase())
+      : false;
+    const folderHint = query.toLowerCase().includes('backend')
+      ? path.includes('backend/')
+      : query.toLowerCase().includes('frontend')
+      ? path.includes('frontend/')
+      : true;
+    return fileMatch && folderHint ? 2 : fileMatch ? 1 : 0;
+  };
+
+  const sorted = matches.sort(
+    (a, b) => softScore(b.metadata) - softScore(a.metadata)
+  );
+
+  return sorted.slice(0, topK).map((m) => m.metadata.text);
 }

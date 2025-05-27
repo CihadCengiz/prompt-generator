@@ -1,10 +1,11 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 // Define Interaction Schema
 const interactionSchema = new mongoose.Schema({
   input: String,
   response: String,
   status: { type: String, default: 'Waiting' },
+  selectedModel: String,
   timestamp: { type: Date, default: Date.now },
 });
 
