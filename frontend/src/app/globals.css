@@ -19,7 +19,8 @@
 
   --background: var(--bg-color);
   --foreground: var(--text-color);
-  --datatable-header-bg: #4338ca;
+  /* Align datatable header color with the indigo-600 buttons */
+  --datatable-header-bg: #4f46e5;
   --datatable-header-text: #ffffff;
 }
 
@@ -47,7 +48,8 @@
     --input-focus-border: #818cf8;
     --shadow-color: rgba(0, 0, 0, 0.4);
     --link-color: #93c5fd;
-    --datatable-header-bg: #6366f1;
+    /* Match light theme to ensure consistency across themes */
+    --datatable-header-bg: #4f46e5;
     --datatable-header-text: #ffffff;
 
     --background: var(--bg-color);
