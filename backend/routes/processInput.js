@@ -81,7 +81,8 @@ router.post('/generate-prompt', async (req, res) => {
             - Be clear, not verbose. \
             - Keep the task atomic (one step at a time). \
             - If the feature request is too vague, still produce the best prompt you can based on available info. \
-            - Never explain or comment. Just return the formatted prompt.",
+            - Never explain or comment. Just return the formatted prompt. \
+            - Only choose a file path or module that appears in the provided context. Do not invent filenames like App.js, Main.jsx or index.html. If unsure, refer to the closest match.",
         },
       });
       aiResponseText = response.text;
