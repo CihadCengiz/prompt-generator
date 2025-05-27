@@ -7,11 +7,16 @@ on:
 
 jobs:
   codex-agent-update:
-    if: >
-      github.event.pull_request.merged == true &&
-      contains(github.event.pull_request.labels.*.name, 'codex-agent')
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+
     steps:
+      - name: Check if PR has 'codex-agent' label
+        id: label-check
+        run: |
+          echo "${{ toJson(github.event.pull_request.labels) }}" | jq -e '.[] | select(.name == "codex-agent")' > /dev/null
+        continue-on-error: false
+
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -23,7 +28,19 @@ jobs:
           files: |
             **/*.js
             **/*.ts
+            **/*.jsx
+            **/*.tsx
+            **/*.py
+            **/*.html
+            **/*.css
+            **/*.scss
             **/*.md
+            **/*.mdx
+            **/*.json
+            **/*.yaml
+            **/*.yml
+            **/*.sh
+            **/*.bash
 
       - name: Delete old chunks for changed files
         run: |
