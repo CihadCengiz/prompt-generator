@@ -13,7 +13,11 @@ jobs:
     steps:
       - name: Check if PR has 'codex' label
         run: |
-          echo "${{ toJson(github.event.pull_request.labels) }}" | jq -e '.[] | select(.name == "codex")' > /dev/null
+          LABELS=$(echo "${{ toJson(github.event.pull_request.labels) }}" | jq -e '.[]? | select(.name == "codex")' || echo "[]")
+          if [[ "$LABELS" == "[]" ]]; then
+            echo "No 'codex' label found."
+            exit 1
+          fi
         continue-on-error: false
 
       - name: Checkout code
